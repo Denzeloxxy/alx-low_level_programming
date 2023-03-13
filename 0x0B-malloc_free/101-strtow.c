@@ -1,100 +1,97 @@
 #include "main.h"
+#include <stdlib.h>
+
+void util(char **, char *);
+void create_word(char **, char *, int, int, int);
 
 /**
- * len - returns length of str
- *@str: string to be counted
+ * strtow - splits a string into words.
+ * @str: the string
  *
- * Return: length of the string
+ * Return: returns a pointer to an array of strings (words)
  */
-
-int len(char *str)
+char **strtow(char *str)
 {
-	int len = 0;
+	int i, flag, len;
+	char **words;
 
-	if (str != NULL)
+	if (str == NULL || str[0] == '\0' || (str[0] == ' ' && str[1] == '\0'))
+		return (NULL);
+
+	i = flag = len = 0;
+	while (str[i])
 	{
-		while (str[len])
+		if (flag == 0 && str[i] != ' ')
+			flag = 1;
+		if (i > 0 && str[i] == ' ' && str[i - 1] != ' ')
+		{
+			flag = 0;
 			len++;
+		}
+		i++;
 	}
-	return (len);
-}
 
-/**
- * num_words - counts the number of words in str
- *@str: string to be used
- *
- *Return: number of words
- */
-int num_words(char *str)
-{
-	int i = 0, words = 0;
+	len += flag == 1 ? 1 : 0;
+	if (len == 0)
+		return (NULL);
 
-	while (i <= len(str))
-	{
-		if ((str[i] != ' ') && (str[i] != '\0'))
-		{
-			i++;
-		}
-		else if (((str[i] == ' ') || (str[i] == '\0')) && i && (str[i - 1] != ' '))
-		{
-			words += 1;
-			i++;
-		}
-		else
-		{
-			i++;
-		}
-	}
+	words = (char **)malloc(sizeof(char *) * (len + 1));
+	if (words == NULL)
+		return (NULL);
+
+	util(words, str);
+	words[len] = NULL;
 	return (words);
 }
 
 /**
- *strtow - splits a stirng into words
- *@str: string to be splitted
- *
- *Return: pointer to the array of splitted words
+ * util - a util function for fetching words into an array
+ * @words: the strings array
+ * @str: the string
  */
-
-char **strtow(char *str)
+void util(char **words, char *str)
 {
-	char **split;
-	int i, j = 0, temp = 0, size = 0, words = num_words(str);
+	int i, j, start, flag;
 
-	if (words == 0)
-		return (NULL);
-	split = (char **)malloc(sizeof(char *) * (words + 1));
-	if (split != NULL)
+	i = j = flag = 0;
+	while (str[i])
 	{
-		for (i = 0; i <= len(str) && words; i++)
+		if (flag == 0 && str[i] != ' ')
 		{
-			if ((str[i] != ' ') && (str[i] != '\0'))
-				size++;
-			else if (((str[i] == ' ') || (str[i] == '\0')) && i && (str[i - 1] != ' '))
-			{
-				split[j] = (char *)malloc(sizeof(char) * size + 1);
-				if (split[j] != NULL)
-				{
-					while (temp < size)
-					{
-						split[j][temp] = str[(i - size) + temp];
-						temp++;
-					}
-					split[j][temp] = '\0';
-					size = temp = 0;
-					j++;
-				}
-				else
-				{
-					while (j-- >= 0)
-						free(split[j]);
-					free(split);
-					return (NULL);
-				}
-			}
+			start = i;
+			flag = 1;
 		}
-		split[words] = NULL;
-		return (split);
+
+		if (i > 0 && str[i] == ' ' && str[i - 1] != ' ')
+		{
+			create_word(words, str, start, i, j);
+			j++;
+			flag = 0;
+		}
+
+		i++;
 	}
-	else
-		return (NULL);
+
+	if (flag == 1)
+		create_word(words, str, start, i, j);
+}
+
+/**
+ * create_word - creates a word and insert it into the array
+ * @words: the array of strings
+ * @str: the string
+ * @start: the starting index of the word
+ * @end: the stopping index of the word
+ * @index: the index of the array to insert the word
+ */
+void create_word(char **words, char *str, int start, int end, int index)
+{
+	int i, j;
+
+	i = end - start;
+	words[index] = (char *)malloc(sizeof(char) * (i + 1));
+
+	for (j = 0; start < end; start++, j++)
+		words[index][j] = str[start];
+	words[index][j] = '\0';
 }
