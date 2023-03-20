@@ -4,7 +4,3 @@
 #define PI 3.14159265359
 
 #endif
-Footer
-© 2023 GitHub, Inc.
-Footer navigation
-
