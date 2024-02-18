@@ -7,6 +7,7 @@
  *        program 101-crackme.
  *
  * Return: Always 0.
+ *Owned by Thabo Denzel 
  */
 int main(void)
 {
